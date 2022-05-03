@@ -1,0 +1,190 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jose7198/places/1.0.0
+info:
+  description: |
+    This api provides access to perform CRUD operations related to r/place 
+    clone.
+  version: 1.0.0
+  title: r-place-clone API
+  contact:
+    email: jose719810@hotmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: tiles
+    description: 'Endpoints associated with performing CRUD operations on tiles'
+paths:
+  /tile:
+    get:
+      tags:
+        - tiles
+      summary: Retrieves an specific board tile
+      description: |
+        By passing the the appropiate X,Y position you can get an specific tile 
+        of the board
+      parameters:
+        - in: query
+          name: posX
+          description: Pass the tile's X position on the board
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 31
+        - in: query
+          name: posY
+          description: Pass the tile's Y position on the board
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 31
+      responses:
+        200:
+          description: Tile on the given position found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tile'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags:
+        - tiles
+      summary: Updates the color of the tile
+      description: |
+        By passing the appropiate parameters you can update the color and the
+        user of a given tile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tile'
+      responses:
+        200:
+          description: Tile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tile'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+  /tiles:
+    get:
+      tags:
+        - tiles
+      summary: Retrieves the tiles board
+      description: Retrieves a list with all the tiles of the board.
+      responses:
+        200:
+          description: List of tiles in the board
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tile'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/ServerError'
+components:
+  schemas:
+    Tile:
+      type: object
+      required:
+        - posX
+        - posY
+        - color
+        - user
+      properties:
+        posX:
+          type: number
+          format: int32
+          example: 12
+        posY:
+          type: number
+          format: int32
+          example: 12
+        color:
+          type: string
+          example: '#f06c34'
+        user:
+          type: string
+          example: 'jose7198'
+        updatedAt:
+          type: number
+          format: int64
+          example: 1651593809
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ErrorToken:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorList:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+  responses:
+    NotFound:
+      description: 'The specified resource was not found'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    BadRequest:
+      description: 'The specified request was invalid'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+    Unauthorized:
+      description: 'Client not authorized to access endpoint'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorToken'
+    Forbidden:
+      description: 'Client not authorized to access endpoint'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorToken'
+    ServerError:
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
